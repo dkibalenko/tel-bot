@@ -15,15 +15,7 @@ SYSTEM_PROMPT = (
 )
 
 
-async def generate_post(topic: str) -> str:  # noqa: RUF029 — stub, replace with real call below
-    # TODO: remove stub once OpenAI billing is active
-    return (
-        f"[STUB] This is a placeholder post about '{topic}'.\n\n"
-        "Add your OpenAI API key with billing to generate real content."
-    )
-
-
-async def _generate_post_real(topic: str) -> str:
+async def generate_post(topic: str) -> str:
     """Generate a Telegram post about the given topic using OpenAI's GPT-4o model.
 
     Args:

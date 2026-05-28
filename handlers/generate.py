@@ -1,3 +1,5 @@
+import openai
+
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -53,7 +55,20 @@ async def cmd_generate(message: Message, state: FSMContext) -> None:
 async def handle_topic(message: Message, state: FSMContext) -> None:
     await message.answer("Generating your post... ⏳")
 
-    post_text = await generate_post(message.text)
+    try:
+        post_text = await generate_post(message.text)
+    except openai.RateLimitError:
+        await state.clear()
+        await message.answer("⚠️ OpenAI quota exceeded. Check your billing and try again.")
+        return
+    except openai.APIConnectionError:
+        await state.clear()
+        await message.answer("⚠️ Could not reach OpenAI. Check your internet connection and try again.")
+        return
+    except openai.APIStatusError as e:
+        await state.clear()
+        await message.answer(f"⚠️ OpenAI returned an error ({e.status_code}). Try again later.")
+        return
 
     # saves generated text into user's notebook - separate per-user data dict
     await state.update_data(post_text=post_text)
