@@ -3,9 +3,10 @@ import logging
 import os
 
 from aiogram import Bot, Dispatcher
+from aiogram.fsm.storage.memory import MemoryStorage
 from dotenv import load_dotenv
 
-from handlers import start
+from handlers import start, generate
 
 load_dotenv()
 
@@ -13,17 +14,11 @@ logging.basicConfig(level=logging.INFO)
 
 
 async def main() -> None:
-    """Main entry point of the bot.
-
-        - Create Bot instance with token from .env
-        - Create Dispatcher instance
-        - Register handlers
-        - Start polling for updates
-    """
     bot = Bot(token=os.getenv("BOT_TOKEN"))
-    dp = Dispatcher()
+    dp = Dispatcher(storage=MemoryStorage())
 
-    dp.include_router(start.router)
+    dp.include_router(generate.router)  # specific handlers first
+    dp.include_router(start.router)     # catch-all last
 
     await dp.start_polling(bot)
 
