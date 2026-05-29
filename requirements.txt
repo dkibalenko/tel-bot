@@ -1,3 +1,6 @@
 aiogram==3.28.2
 python-dotenv==1.2.2
 openai==2.38.0
+asyncpg==0.31.0
+redis==8.0.0
+apscheduler==3.11.2
