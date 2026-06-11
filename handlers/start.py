@@ -8,7 +8,7 @@ router = Router()
 @router.message(Command("start"))
 async def cmd_start(message: Message) -> None:
     await message.answer(
-        f"Hi, {message.from_user.first_name}! I'm your Contenta bot.\n"
+        f"Hi, {message.from_user.first_name}! I'm your Tel bot.\n"
         "Send me any text and I'll echo it back.\n"
         "Use /help to see available commands."
     )

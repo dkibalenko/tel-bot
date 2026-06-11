@@ -22,14 +22,9 @@ load_dotenv()
 logger = getLogger(__name__)
 router = Router()
 
-# --------------- Defining the states ------------------------------------
 
 
 class PostFlow(StatesGroup):
-    # container that names a set of states
-    # aiogram reads the class and assigns each State() a unique string key,
-    # "PostFlow:waiting_for_topic" and "PostFlow:reviewing_post".
-    # That string is what actually gets saved into storage.
     waiting_for_topic = State()
     reviewing_post = State()
     waiting_for_time = State()
@@ -49,16 +44,13 @@ _approve_keyboard = InlineKeyboardMarkup(
 
 @router.message(Command("generate"))
 async def cmd_generate(message: Message, state: FSMContext) -> None:  # pragma: no cover
-    # writes this user's state into storage
-    # aiogram knows: "this user is in waiting_for_topic"
     await state.set_state(PostFlow.waiting_for_topic)
-    # bot asks the question (bot.send_message(chat_id=message.chat.id, text=))
     await message.answer("What topic should I write about?")
 
 
 # ------------ User replies with a topic -----------------------------
 
-# state filter, only fires when update is message & this user's stored state is waiting_for_topic
+
 @router.message(PostFlow.waiting_for_topic)
 async def handle_topic(message: Message, state: FSMContext) -> None:
     await message.answer("Generating your post... ⏳")
@@ -79,11 +71,9 @@ async def handle_topic(message: Message, state: FSMContext) -> None:
         await message.answer(f"⚠️ OpenAI returned an error ({e.status_code}). Try again later.")
         return
 
-    # saves generated text into user's notebook - separate per-user data dict
     await state.update_data(post_text=post_text)
-    await state.set_state(PostFlow.reviewing_post)  # advances the state machine
+    await state.set_state(PostFlow.reviewing_post)
 
-    # attach inline buttons message
     await message.answer(
         f"Here's your post preview:\n\n{post_text}",
         reply_markup=_approve_keyboard,
@@ -92,8 +82,6 @@ async def handle_topic(message: Message, state: FSMContext) -> None:
 
 # ------------------- User taps a button --------------------------------
 
-# only fires when event is callback query & its data is "post_now" &
-# this user is in state reviewing_post
 @router.callback_query(F.data == "post_now", PostFlow.reviewing_post)
 async def handle_post_now(callback: CallbackQuery, state: FSMContext, bot: Bot) -> None:
     data = await state.get_data()  # retrieves the user's notebook
@@ -137,8 +125,6 @@ async def handle_time(message: Message, state: FSMContext) -> None:
             )
     except ValueError as e:
         logger.debug(f"Invalid time input from user: {e}")
-        # user stays in waiting_for_time & can send a corrected time
-        # no state.clear() - keep them in the state & let them retry
         await message.answer("⚠️ Invalid format. Send time like: 18:00")
         return
 

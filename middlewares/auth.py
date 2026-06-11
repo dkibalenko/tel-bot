@@ -9,8 +9,8 @@ class AuthMiddleware(BaseMiddleware):
     async def __call__(
         self,
         handler: Callable[[TelegramObject, dict[str, Any]], Awaitable[Any]],
-        event: TelegramObject,  # passes through to handler unchanged
-        data: dict[str, Any],  # has "event_from_user" key with user info, if available
+        event: TelegramObject,
+        data: dict[str, Any],
     ) -> Any:
         user = data.get("event_from_user")
         allowed = os.getenv("ALLOWED_USERS", "").split(",")
