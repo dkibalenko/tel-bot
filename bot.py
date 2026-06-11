@@ -9,6 +9,7 @@ from redis.asyncio import Redis
 
 from db.pool import create_pool, close_pool
 from handlers import start, generate
+from middlewares.auth import AuthMiddleware
 from services.scheduler import scheduler, post_due_items
 
 load_dotenv()
@@ -48,6 +49,9 @@ async def main() -> None:
     # lifecycle hooks - run before polling starts and after it stops
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
+
+    dp.message.outer_middleware(AuthMiddleware())
+    dp.callback_query.outer_middleware(AuthMiddleware())
 
     dp.include_router(generate.router)  # specific handlers first
     dp.include_router(start.router)     # catch-all last
