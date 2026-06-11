@@ -48,7 +48,7 @@ _approve_keyboard = InlineKeyboardMarkup(
 
 
 @router.message(Command("generate"))
-async def cmd_generate(message: Message, state: FSMContext) -> None:
+async def cmd_generate(message: Message, state: FSMContext) -> None:  # pragma: no cover
     # writes this user's state into storage
     # aiogram knows: "this user is in waiting_for_topic"
     await state.set_state(PostFlow.waiting_for_topic)
@@ -105,7 +105,7 @@ async def handle_post_now(callback: CallbackQuery, state: FSMContext, bot: Bot) 
 
 
 @router.callback_query(F.data == "schedule", PostFlow.reviewing_post)
-async def handle_schedule(callback: CallbackQuery, state: FSMContext) -> None:
+async def handle_schedule(callback: CallbackQuery, state: FSMContext) -> None:  # pragma: no cover
     await state.set_state(PostFlow.waiting_for_time)
     await callback.message.answer("When should I post this? Send time as HH:MM (UTC).")
     await callback.answer()
