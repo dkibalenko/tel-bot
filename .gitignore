@@ -310,3 +310,4 @@ pip-selfcheck.json
 
 notes/
 CLAUDE.md
+coverage.lcov
